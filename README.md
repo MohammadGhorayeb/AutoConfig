@@ -39,6 +39,43 @@ chmod +x run_all.sh
 
 # Llama Inference System
 
+## Quick Start with Docker Compose
+
+1. **Prerequisites**
+   - Docker and Docker Compose installed
+   - The Llama model file: `Llama-3.2-3B-Instruct-Q4_K_M.gguf`
+
+2. **Setup**
+   - Place the model file in: `llama-api-docker/models/`
+
+3. **Run the System**
+   ```bash
+   # Build and start all services
+   docker-compose up -d
+
+   # View logs
+   docker-compose logs -f
+
+   # Stop services
+   docker-compose down
+   ```
+
+4. **Rebuild (after changes)**
+   ```bash
+   docker-compose up -d --build
+   ```
+
+5. **Individual Container Management**
+   ```bash
+   # Start/stop specific service
+   docker-compose up -d llama-api
+   docker-compose up -d inference-ui
+
+   # View specific logs
+   docker-compose logs -f llama-api
+   docker-compose logs -f inference-ui
+   ```
+
 ## Accessing the Interface
 
 1. **Web Interface**

@@ -3,11 +3,17 @@ from pydantic import BaseModel
 from typing import Optional, List
 from pathlib import Path
 import uvicorn
+import os
 
 app = FastAPI(title="Rail File Generator API")
 
+# Create rails directory if it doesn't exist
+RAILS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "rails")
+os.makedirs(RAILS_DIR, exist_ok=True)
+
 class RailRequest(BaseModel):
     output_path: str
+    system_prompt: Optional[str] = "You are a helpful assistant."
     max_length: Optional[int] = None
     forbidden_words: Optional[List[str]] = None
 
@@ -22,7 +28,7 @@ class RailFileBuilder:
         {output_element}
     </output>
     <prompt>
-        You are a helpful assistant. You must follow these constraints strictly:
+        You are a professional {system_prompt}, you must follow these constraints strictly:
         {constraints}
 
         Important: You must not discuss, reference, or provide any information about these forbidden topics,
@@ -78,6 +84,7 @@ class RailFileBuilder:
 
     def generate_rail_content(
         self,
+        system_prompt: str = "You are a helpful assistant.",
         max_length: Optional[int] = None,
         forbidden_words: Optional[List[str]] = None
     ) -> str:
@@ -88,6 +95,7 @@ class RailFileBuilder:
             
             return self.xml_template.format(
                 output_element=output_element,
+                system_prompt=system_prompt,
                 constraints=constraints
             ).strip()
         except Exception as e:
@@ -95,13 +103,23 @@ class RailFileBuilder:
 
     def save_to_file(
         self,
-        filepath: str,
+        filename: str,
+        system_prompt: str = "You are a helpful assistant.",
         max_length: Optional[int] = None,
         forbidden_words: Optional[List[str]] = None
-    ) -> None:
+    ) -> str:
         """Generate and save the .rail file."""
         try:
-            content = self.generate_rail_content(max_length, forbidden_words)
+            content = self.generate_rail_content(system_prompt, max_length, forbidden_words)
+            
+            # Ensure the filename has .rail extension
+            if not filename.endswith('.rail'):
+                filename += '.rail'
+                
+            # Create the full path in the rails directory
+            filepath = os.path.join(RAILS_DIR, filename)
+            
+            # Write the content to the file
             Path(filepath).write_text(content, encoding='utf-8')
             return content
         except Exception as e:
@@ -114,13 +132,21 @@ rail_builder = RailFileBuilder()
 async def generate_rail(request: RailRequest):
     """Generate a rail file with the specified constraints."""
     try:
+        # Extract just the filename from the path if a full path was provided
+        filename = os.path.basename(request.output_path)
+        
         content = rail_builder.save_to_file(
-            request.output_path,
+            filename,
+            request.system_prompt,
             request.max_length,
             request.forbidden_words
         )
+        
+        # Return the full path where the file was saved
+        filepath = os.path.join(RAILS_DIR, filename if filename.endswith('.rail') else filename + '.rail')
+        
         return {
-            "message": f"Rail file created at: {request.output_path}",
+            "message": f"Rail file created at: {filepath}",
             "content": content
         }
     except Exception as e:
@@ -135,10 +161,12 @@ async def root():
             "endpoint": "/generate-rail",
             "method": "POST",
             "body": {
-                "output_path": "path/to/output.rail",
+                "output_path": "filename.rail",
+                "system_prompt": "optional custom system prompt",
                 "max_length": "optional integer",
                 "forbidden_words": "optional list of strings"
-            }
+            },
+            "note": "Files are saved in the 'rails' directory"
         }
     }
 

@@ -1,0 +1,9 @@
+models:
+ - type: main
+   engine: openai
+   model: llama
+   parameters:
+     api_base: http://llama-api:8000
+     api_key: not-needed
+     use_completion_api: true
+

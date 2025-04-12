@@ -38,4 +38,4 @@ class CustomLLM(LLM):
     @property
     def _identifying_params(self) -> Mapping[str, Any]:
         """Get the identifying parameters."""
-        return {"api_url": self.api_url} 
+        return {"api_url": self.api_url}

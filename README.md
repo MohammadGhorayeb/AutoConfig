@@ -43,10 +43,11 @@ chmod +x run_all.sh
 
 1. **Prerequisites**
    - Docker and Docker Compose installed
-   - The Llama model file: `Llama-3.2-3B-Instruct-Q4_K_M.gguf`
+   - The Llama model files in transformers format (config.json, tokenizer files, model weights)
 
 2. **Setup**
-   - Place the model file in: `llama-api-docker/models/`
+   - Place the model files in: `llama-api-docker/models_new/Llama-3.2-1B_new/`
+   - The system uses HuggingFace Transformers to load the model (not llama-cpp)
 
 3. **Run the System**
    ```bash
@@ -89,6 +90,11 @@ chmod +x run_all.sh
 2. **API Testing with Postman**
    - Base URL: `http://localhost:8000`
    
+   **API Health Check:**
+   - URL: `http://localhost:8000/health`
+   - Method: `GET`
+   - Returns basic health status of the API
+
    **Generate Text Endpoint:**
    - URL: `http://localhost:8000/generate`
    - Method: `POST`
@@ -102,7 +108,8 @@ chmod +x run_all.sh
        "prompt": "Your text prompt here",
        "temperature": 0.7,
        "max_tokens": 100,
-       "stop": ["Q:"]
+       "stop": ["Q:"],
+       "top_p": 0.9
      }
      ```
 
@@ -110,6 +117,7 @@ chmod +x run_all.sh
    - URL: `http://localhost:8000/model-info`
    - Method: `GET`
    - No body required
+   - Returns information about the loaded model including status
 
    Example curl command:
    ```bash
@@ -119,6 +127,65 @@ chmod +x run_all.sh
        "prompt": "Tell me a short story",
        "temperature": 0.7,
        "max_tokens": 100,
-       "stop": ["Q:"]
+       "stop": ["Q:"],
+       "top_p": 0.9
      }'
    ```
+
+## System Architecture
+
+The system consists of two main components:
+
+1. **Llama API (Backend)**
+   - FastAPI server loading the LLaMA model with HuggingFace Transformers
+   - Provides endpoints for text generation and model information
+   - Automatically loads model from the specified directory
+
+2. **Inference UI (Frontend)**
+   - Simple web interface for interacting with the model
+   - Sends requests to the API and displays responses
+   - Provides controls for adjusting generation parameters
+
+## Manual Setup (Alternative to Docker Compose)
+
+```bash
+# Create Docker network
+docker network create llama-network || true
+
+# Stop and remove existing containers
+docker rm -f llama-api inference-ui || true
+
+# Build both images
+docker build -t llama-api ./llama-api-docker
+docker build -t inference-ui ./inference-ui
+
+# Run both containers
+docker run -d \
+  --name llama-api \
+  --network llama-network \
+  -p 8000:8000 \
+  -v $(pwd)/llama-api-docker/models_new:/app/models_new \
+  llama-api
+
+docker run -d \
+  --name inference-ui \
+  --network llama-network \
+  -p 3000:3000 \
+  inference-ui
+
+# Show running containers
+docker ps
+
+# Show logs of both containers
+echo "=== Llama API Logs ==="
+docker logs llama-api
+echo "=== Inference UI Logs ==="
+docker logs inference-ui
+```
+
+## Troubleshooting
+
+- If the model fails to load, check that all required files are in the model directory
+- The API provides a `/health` endpoint that will respond even if the model is still loading
+- Check container logs for detailed error messages
+- Ensure your model is compatible with HuggingFace Transformers

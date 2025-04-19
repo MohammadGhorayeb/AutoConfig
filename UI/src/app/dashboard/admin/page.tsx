@@ -127,7 +127,30 @@ export default function AdminDashboard() {
     setSuccess('');
     setError('');
     
+    // Add a safety timeout to reset the button state after 15 seconds
+    const timeoutId = setTimeout(() => {
+      setAddingEmployee(false);
+      setError('Operation timed out. The server might be down or unreachable.');
+    }, 15000);
+    
     try {
+      console.log('Making API request to /api/employees');
+      
+      // Test the connection first with a simple fetch
+      try {
+        const testConnection = await fetch('/api/health', { method: 'GET' });
+        if (!testConnection.ok) {
+          throw new Error('API server appears to be down or unreachable');
+        }
+      } catch (connectionErr) {
+        console.error('Connection test failed:', connectionErr);
+        setError('Cannot connect to the server. Please check your network connection.');
+        clearTimeout(timeoutId);
+        setAddingEmployee(false);
+        return;
+      }
+      
+      // Proceed with the actual employee creation
       const response = await fetch('/api/employees', {
         method: 'POST',
         headers: {
@@ -136,13 +159,22 @@ export default function AdminDashboard() {
         body: JSON.stringify(newEmployee),
       });
       
-      const data = await response.json();
+      console.log('API response status:', response.status);
       
-      if (response.ok) {
+      let data;
+      try {
+        data = await response.json();
+        console.log('API response data:', data);
+      } catch (jsonError: any) {
+        throw new Error(`Invalid response from server: ${jsonError.message}`);
+      }
+      
+      if (response.ok && data.employee) {
         // Add the new employee to the list
+        console.log('Employee added successfully:', data.employee);
         setEmployees([...employees, {
-          id: data.employee.id,
-          _id: data.employee.id,
+          id: data.employee.id || data.employee._id,
+          _id: data.employee.id || data.employee._id,
           name: data.employee.name,
           email: data.employee.email,
           jobTitle: data.employee.jobTitle,
@@ -157,12 +189,13 @@ export default function AdminDashboard() {
           setTempPassword(data.tempPassword);
         }
       } else {
-        setError(data.message || 'Failed to add employee');
+        setError(data.message || `Failed to add employee. Server returned status ${response.status}`);
       }
     } catch (err: any) {
       console.error('Error adding employee:', err);
-      setError(err.message || 'An error occurred');
+      setError(`Error: ${err.message || 'An unknown error occurred'}`);
     } finally {
+      clearTimeout(timeoutId);
       setAddingEmployee(false);
     }
   };
@@ -172,6 +205,12 @@ export default function AdminDashboard() {
     setAddingTask(true);
     setSuccess('');
     setError('');
+    
+    // Add a safety timeout to reset the button state after 10 seconds
+    const timeoutId = setTimeout(() => {
+      setAddingTask(false);
+      setError('Operation timed out. Please try again.');
+    }, 10000);
     
     try {
       const response = await fetch('/api/tasks', {
@@ -206,6 +245,7 @@ export default function AdminDashboard() {
       console.error('Error adding task:', err);
       setError(err.message || 'An error occurred');
     } finally {
+      clearTimeout(timeoutId);
       setAddingTask(false);
     }
   };
@@ -438,7 +478,7 @@ export default function AdminDashboard() {
             {addingEmployee && (
               <div className="mb-6 bg-white p-6 rounded-lg shadow-md">
                 <h3 className="text-lg font-medium mb-4">Add New Employee</h3>
-                <form onSubmit={handleAddEmployee} className="space-y-4">
+                <form className="space-y-4">
                   <div>
                     <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
                     <input
@@ -473,11 +513,81 @@ export default function AdminDashboard() {
                     />
                   </div>
                   <button
-                    type="submit"
-                    disabled={addingEmployee}
+                    type="button"
+                    onClick={async () => {
+                      try {
+                        // Clear previous messages
+                        setError('');
+                        setSuccess('');
+                        
+                        // Validate form fields
+                        if (!newEmployee.name || !newEmployee.email) {
+                          setError('Name and email are required');
+                          return;
+                        }
+                        
+                        // Set loading state
+                        setAddingEmployee(true);
+                        
+                        console.log('Adding employee with data:', newEmployee);
+                        
+                        // Direct fetch call
+                        try {
+                          const response = await fetch('/api/employees', {
+                            method: 'POST',
+                            headers: {
+                              'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(newEmployee),
+                          });
+                          
+                          console.log('Employee API response status:', response.status);
+                          
+                          let data;
+                          try {
+                            data = await response.json();
+                            console.log('Employee API response data:', data);
+                          } catch (jsonError: any) {
+                            console.error('Error parsing employee response:', jsonError);
+                            throw new Error(`Invalid response from server: Could not parse JSON`);
+                          }
+                          
+                          if (response.ok && data.employee) {
+                            // Add the new employee to the list
+                            setEmployees([...employees, {
+                              id: data.employee.id || data.employee._id,
+                              _id: data.employee.id || data.employee._id,
+                              name: data.employee.name,
+                              email: data.employee.email,
+                              jobTitle: data.employee.jobTitle || '',
+                              isActive: data.employee.isActive
+                            }]);
+                            
+                            // Reset form
+                            setNewEmployee({ name: '', email: '', jobTitle: '' });
+                            setSuccess('Employee added successfully');
+                            
+                            // Store temporary password if provided
+                            if (data.tempPassword) {
+                              setTempPassword(data.tempPassword);
+                            }
+                          } else {
+                            setError(data.message || `Failed to add employee (Status ${response.status})`);
+                          }
+                        } catch (fetchError: any) {
+                          console.error('Network error adding employee:', fetchError);
+                          setError(`Network error: ${fetchError.message || 'Could not connect to server'}`);
+                        }
+                      } catch (err: any) {
+                        console.error('Unexpected error in employee form:', err);
+                        setError(`Error: ${err.message || 'An unknown error occurred'}`);
+                      } finally {
+                        setAddingEmployee(false);
+                      }
+                    }}
                     className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50"
                   >
-                    {addingEmployee ? 'Adding...' : 'Add Employee'}
+                    Add Employee
                   </button>
                 </form>
               </div>
@@ -557,7 +667,7 @@ export default function AdminDashboard() {
             {addingTask && (
               <div className="mb-6 bg-white p-6 rounded-lg shadow-md">
                 <h3 className="text-lg font-medium mb-4">Add New Task</h3>
-                <form onSubmit={handleAddTask} className="space-y-4">
+                <form className="space-y-4">
                   <div>
                     <label htmlFor="title" className="block text-sm font-medium text-gray-700">Title</label>
                     <input
@@ -598,11 +708,78 @@ export default function AdminDashboard() {
                     </select>
                   </div>
                   <button
-                    type="submit"
-                    disabled={addingTask}
+                    type="button"
+                    onClick={async () => {
+                      try {
+                        // Clear previous messages
+                        setError('');
+                        setSuccess('');
+                        
+                        // Validate form fields
+                        if (!newTask.title || !newTask.description || !newTask.assignedTo) {
+                          setError('Title, description, and assigned employee are required');
+                          return;
+                        }
+                        
+                        // Set loading state
+                        setAddingTask(true);
+                        
+                        console.log('Adding task with data:', newTask);
+                        
+                        // Direct fetch call
+                        try {
+                          const response = await fetch('/api/tasks', {
+                            method: 'POST',
+                            headers: {
+                              'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(newTask),
+                          });
+                          
+                          console.log('Task API response status:', response.status);
+                          
+                          let data;
+                          try {
+                            data = await response.json();
+                            console.log('Task API response data:', data);
+                          } catch (jsonError: any) {
+                            console.error('Error parsing task response:', jsonError);
+                            throw new Error(`Invalid response from server: Could not parse JSON`);
+                          }
+                          
+                          if (response.ok && data.success) {
+                            // Add the new task to the list
+                            const newTaskData = {
+                              id: data.task._id || data.task.id,
+                              _id: data.task._id || data.task.id,
+                              title: data.task.title,
+                              description: data.task.description,
+                              assignedTo: data.task.assignedTo,
+                              status: data.task.status,
+                              createdBy: data.task.createdBy
+                            };
+                            
+                            // Add task to list and reset form
+                            setTasks([...tasks, newTaskData]);
+                            setNewTask({ title: '', description: '', assignedTo: '' });
+                            setSuccess('Task added successfully');
+                          } else {
+                            setError(data.message || `Failed to add task (Status ${response.status})`);
+                          }
+                        } catch (fetchError: any) {
+                          console.error('Network error adding task:', fetchError);
+                          setError(`Network error: ${fetchError.message || 'Could not connect to server'}`);
+                        }
+                      } catch (err: any) {
+                        console.error('Unexpected error in task form:', err);
+                        setError(`Error: ${err.message || 'An unknown error occurred'}`);
+                      } finally {
+                        setAddingTask(false);
+                      }
+                    }}
                     className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50"
                   >
-                    {addingTask ? 'Adding...' : 'Add Task'}
+                    Add Task
                   </button>
                 </form>
               </div>

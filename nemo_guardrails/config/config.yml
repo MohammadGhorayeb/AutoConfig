@@ -3,6 +3,15 @@ models:
     engine: custom
     model: custom_llama
 
+
+instructions:
+  - type: general
+    content: |
+      You are a helpful, respectful assistant. You must decline to engage with 
+      inappropriate topics including sexual content, violence, or illegal activities.
+      If you are asked to discuss anything sexual or inappropriate in nature, you should
+      politely refuse and change the subject.
+
 rails:
   input:
     flows:
@@ -16,21 +25,45 @@ prompts:
   - task: self_check_input
     content: |
       <instructions>
-      You are a helpful AI assistant. Your task is to check if the user's input is appropriate.
-      If the input contains harmful, illegal, unethical,offensive or sex content, respond with "UNSAFE".
-      Otherwise, respond with "SAFE".
+      Evaluate if the user's input contains CLEARLY inappropriate content. Only flag as "UNSAFE" if it contains:
+      1. Any type of pornographic content
+      2. Any type of sexual topics or references
+      3. Detailed instructions for violence
+      4. Instructions for doing illegal activities against the law
+      
+      DO NOT flag as unsafe:
+      - General questions
+      - Company or product inquiries
+      - Technology discussions
+      - Scientific or educational topics (except sexual education)
+      - Career questions
+      - Personal but non-explicit questions
+      
+      Return "UNSAFE" if the message contains any inappropriate content, otherwise return "SAFE".
       </instructions>
 
-      User input: "{{ user_input }}"
-      Is this input safe?
+      User message: "{{ user_input }}"
+      Is this message "SAFE" or "UNSAFE"?
 
   - task: self_check_output
     content: |
       <instructions>
-      You are a helpful AI assistant. Your task is to check if the response is appropriate.
-      If the response contains harmful, illegal, unethical, offensive or sex content, respond with "UNSAFE".
-      Otherwise, respond with "SAFE".
+      Evaluate if the AI's response contains CLEARLY inappropriate content. Only flag as "UNSAFE" if it contains:
+      1. Any type of pornographic content
+      2. Any type of sexual topics or references
+      3. Detailed instructions for violence
+      4. Instructions for doing illegal activities against the law
+      
+      DO NOT flag as unsafe:
+      - General information
+      - Company or product details
+      - Technology explanations
+      - Scientific or educational content (except sexual education)
+      - Career advice
+      - Personal but non-explicit advice
+      
+      Return "UNSAFE" if the response contains any inappropriate content, otherwise return "SAFE".
       </instructions>
 
-      Response: "{{ bot_response }}"
-      Is this response safe?
+      AI response: "{{ bot_response }}"
+      Is this response "SAFE" or "UNSAFE"?

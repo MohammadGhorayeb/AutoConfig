@@ -1,9 +1,69 @@
 models:
- - type: main
-   engine: openai
-   model: llama
-   parameters:
-     api_base: http://llama-api:8000
-     api_key: not-needed
-     use_completion_api: true
+  - type: main
+    engine: custom
+    model: custom_llama
 
+
+instructions:
+  - type: general
+    content: |
+      You are a helpful, respectful assistant. You must decline to engage with 
+      inappropriate topics including sexual content, violence, or illegal activities.
+      If you are asked to discuss anything sexual or inappropriate in nature, you should
+      politely refuse and change the subject.
+
+rails:
+  input:
+    flows:
+      - self check input
+
+  output:
+    flows:
+      - self check output
+
+prompts:
+  - task: self_check_input
+    content: |
+      <instructions>
+      Evaluate if the user's input contains CLEARLY inappropriate content. Only flag as "UNSAFE" if it contains:
+      1. Any type of pornographic content
+      2. Any type of sexual topics or references
+      3. Detailed instructions for violence
+      4. Instructions for doing illegal activities against the law
+      
+      DO NOT flag as unsafe:
+      - General questions
+      - Company or product inquiries
+      - Technology discussions
+      - Scientific or educational topics (except sexual education)
+      - Career questions
+      - Personal but non-explicit questions
+      
+      Return "UNSAFE" if the message contains any inappropriate content, otherwise return "SAFE".
+      </instructions>
+
+      User message: "{{ user_input }}"
+      Is this message "SAFE" or "UNSAFE"?
+
+  - task: self_check_output
+    content: |
+      <instructions>
+      Evaluate if the AI's response contains CLEARLY inappropriate content. Only flag as "UNSAFE" if it contains:
+      1. Any type of pornographic content
+      2. Any type of sexual topics or references
+      3. Detailed instructions for violence
+      4. Instructions for doing illegal activities against the law
+      
+      DO NOT flag as unsafe:
+      - General information
+      - Company or product details
+      - Technology explanations
+      - Scientific or educational content (except sexual education)
+      - Career advice
+      - Personal but non-explicit advice
+      
+      Return "UNSAFE" if the response contains any inappropriate content, otherwise return "SAFE".
+      </instructions>
+
+      AI response: "{{ bot_response }}"
+      Is this response "SAFE" or "UNSAFE"?

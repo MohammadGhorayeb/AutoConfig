@@ -3,12 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Llama Inference UI</title>
+    <title>LLM Inference UI</title>
     <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
     <div class="container">
-        <h1>Llama Model Interface</h1>
+        <h1>LLM Interface</h1>
+        
+        <div class="model-info">
+            <div id="modelStatus" class="status-indicator">Checking API status...</div>
+            <div id="guardrailsStatus" class="guardrails-indicator">Guardrails: Unknown</div>
+        </div>
+        
         <div class="input-section">
             <textarea id="promptInput" placeholder="Enter your prompt here..."></textarea>
             <div class="controls">
@@ -21,11 +27,19 @@
                     <label for="maxTokens">Max Tokens:</label>
                     <input type="number" id="maxTokens" value="100" min="1" max="2048">
                 </div>
+                <div class="parameter">
+                    <label for="endpoint">Endpoint:</label>
+                    <select id="endpoint">
+                        <option value="auto" selected>Auto-detect</option>
+                        <option value="generate">Direct LLM (/generate)</option>
+                        <option value="chat">Guardrailed LLM (/chat)</option>
+                    </select>
+                </div>
                 <button id="generateBtn">Generate</button>
             </div>
         </div>
         <div class="output-section">
-            <h2>Response:</h2>
+            <h2>Response: <span id="responseType" class="response-type"></span></h2>
             <div id="response" class="response"></div>
         </div>
     </div>

@@ -23,6 +23,16 @@ interface Task {
   createdBy?: string | { _id: string; name: string };
 }
 
+interface Document {
+  id?: string;
+  _id?: string;
+  title: string;
+  filename: string;
+  path?: string;
+  uploadedAt?: string;
+  size?: number;
+}
+
 interface BusinessSettings {
   name: string;
   logoUrl: string;
@@ -31,14 +41,19 @@ interface BusinessSettings {
 export default function AdminDashboard() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [documents, setDocuments] = useState<Document[]>([]);
   const [newEmployee, setNewEmployee] = useState({ name: '', email: '', jobTitle: '' });
   const [newTask, setNewTask] = useState({ title: '', description: '', assignedTo: '' });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [activeSection, setActiveSection] = useState<'summary' | 'employees' | 'tasks' | 'settings'>('summary');
+  const [activeSection, setActiveSection] = useState<'summary' | 'employees' | 'tasks' | 'documents' | 'settings'>('summary');
   const [addingEmployee, setAddingEmployee] = useState(false);
   const [addingTask, setAddingTask] = useState(false);
+  const [uploadingDocument, setUploadingDocument] = useState(false);
+  const [selectedDocument, setSelectedDocument] = useState<File | null>(null);
+  const [documentTitle, setDocumentTitle] = useState('');
+  const [processingRag, setProcessingRag] = useState(false);
   const [statusUpdating, setStatusUpdating] = useState<string | null>(null);
   const [tempPassword, setTempPassword] = useState<string | null>(null);
   const [businessSettings, setBusinessSettings] = useState<BusinessSettings>({ 
@@ -115,7 +130,22 @@ export default function AdminDashboard() {
       }
     };
     
-    Promise.all([fetchEmployees(), fetchTasks(), fetchBusinessSettings()])
+    const fetchDocuments = async () => {
+      try {
+        const response = await fetch('/api/documents');
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+          setDocuments(data.documents || []);
+        } else {
+          console.error('Failed to fetch documents:', data.message);
+        }
+      } catch (err) {
+        console.error('Error fetching documents:', err);
+      }
+    };
+    
+    Promise.all([fetchEmployees(), fetchTasks(), fetchBusinessSettings(), fetchDocuments()])
       .then(() => setIsLoading(false))
       .catch(() => setIsLoading(false));
   }, []);
@@ -344,6 +374,100 @@ export default function AdminDashboard() {
       setError(err.message || 'An error occurred');
     } finally {
       setUpdatingSettings(false);
+    }
+  };
+
+  const handleDocumentSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setSelectedDocument(e.target.files[0]);
+      // Default title to filename without extension
+      const filename = e.target.files[0].name;
+      const defaultTitle = filename.split('.').slice(0, -1).join('.');
+      setDocumentTitle(defaultTitle);
+    }
+  };
+
+  const handleDocumentUpload = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedDocument) return;
+    
+    setUploadingDocument(true);
+    setSuccess('');
+    setError('');
+    
+    // Create a FormData object to send the file
+    const formData = new FormData();
+    formData.append('document', selectedDocument);
+    formData.append('title', documentTitle || selectedDocument.name);
+    
+    try {
+      const response = await fetch('/api/documents', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok && data.success) {
+        // Add the new document to the list
+        setDocuments([...documents, data.document]);
+        setSelectedDocument(null);
+        setDocumentTitle('');
+        setSuccess('Document uploaded successfully');
+      } else {
+        setError(data.message || 'Failed to upload document');
+      }
+    } catch (err: any) {
+      console.error('Error uploading document:', err);
+      setError(err.message || 'An error occurred');
+    } finally {
+      setUploadingDocument(false);
+    }
+  };
+
+  const handleProcessRag = async () => {
+    setProcessingRag(true);
+    setSuccess('');
+    setError('');
+    
+    try {
+      const response = await fetch('/api/rag/process', {
+        method: 'POST',
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok && data.success) {
+        setSuccess('RAG system processed documents successfully');
+      } else {
+        setError(data.message || 'Failed to process RAG');
+      }
+    } catch (err: any) {
+      console.error('Error processing RAG:', err);
+      setError(err.message || 'An error occurred');
+    } finally {
+      setProcessingRag(false);
+    }
+  };
+
+  const deleteDocument = async (id: string) => {
+    try {
+      const response = await fetch(`/api/documents/${id}`, {
+        method: 'DELETE',
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok && data.success) {
+        // Remove the document from the list
+        setDocuments(documents.filter(doc => doc._id !== id));
+        setSuccess('Document deleted successfully');
+      } else {
+        setError(data.message || 'Failed to delete document');
+      }
+    } catch (err: any) {
+      console.error('Error deleting document:', err);
+      setError(err.message || 'An error occurred');
     }
   };
 
@@ -834,6 +958,136 @@ export default function AdminDashboard() {
             </div>
           </div>
         );
+      case 'documents':
+        return (
+          <div>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold">Document Management</h2>
+              <div className="flex space-x-4">
+                <button
+                  onClick={() => setUploadingDocument(!uploadingDocument)}
+                  className="bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                >
+                  {uploadingDocument ? 'Cancel' : 'Upload Document'}
+                </button>
+                <button
+                  onClick={handleProcessRag}
+                  disabled={processingRag}
+                  className={`py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                    processingRag ? 'bg-blue-300 text-white cursor-not-allowed' : 'bg-blue-600 text-white hover:bg-blue-700'
+                  }`}
+                >
+                  {processingRag ? 'Processing...' : 'Process RAG'}
+                </button>
+              </div>
+            </div>
+
+            {uploadingDocument && (
+              <div className="mb-6 bg-white p-6 rounded-lg shadow-md">
+                <h3 className="text-lg font-medium mb-4">Upload New Document</h3>
+                <form className="space-y-4" onSubmit={handleDocumentUpload}>
+                  <div>
+                    <label htmlFor="title" className="block text-sm font-medium text-gray-700">Document Title</label>
+                    <input
+                      type="text"
+                      id="title"
+                      value={documentTitle}
+                      onChange={(e) => setDocumentTitle(e.target.value)}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm px-3 py-2 border"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="document" className="block text-sm font-medium text-gray-700">Document File</label>
+                    <input
+                      type="file"
+                      id="document"
+                      onChange={handleDocumentSelect}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
+                      accept=".txt,.pdf,.docx,.md"
+                      required
+                    />
+                    <p className="mt-1 text-sm text-gray-500">
+                      Accepted file types: .txt, .pdf, .docx, .md
+                    </p>
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={uploadingDocument && !selectedDocument}
+                    className={`px-4 py-2 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 ${
+                      uploadingDocument && !selectedDocument
+                        ? 'bg-purple-300 cursor-not-allowed'
+                        : 'bg-purple-600 hover:bg-purple-700'
+                    }`}
+                  >
+                    {uploadingDocument ? 'Uploading...' : 'Upload'}
+                  </button>
+                </form>
+              </div>
+            )}
+
+            <div className="bg-white shadow-md rounded-lg overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <h3 className="text-lg font-medium">Documents</h3>
+                <p className="text-sm text-gray-500">Manage documents for the RAG system</p>
+              </div>
+              
+              {documents.length === 0 ? (
+                <div className="p-6 text-center text-gray-500">
+                  No documents uploaded yet. Upload documents to enhance the AI with company-specific knowledge.
+                </div>
+              ) : (
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Filename</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Uploaded</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Size</th>
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {documents.map((doc) => (
+                      <tr key={doc.id || doc._id}>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900">{doc.title}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-500">{doc.filename}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-500">
+                            {doc.uploadedAt ? new Date(doc.uploadedAt).toLocaleDateString() : 'Unknown'}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-500">
+                            {doc.size ? `${Math.round(doc.size / 1024)} KB` : 'Unknown'}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                          <button
+                            onClick={() => deleteDocument(doc.id || doc._id || '')}
+                            className="text-red-600 hover:text-red-900"
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+              
+              <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
+                <p className="text-sm text-gray-600">
+                  After uploading documents, click "Process RAG" to make the documents available for the AI chat.
+                </p>
+              </div>
+            </div>
+          </div>
+        );
       case 'settings':
         return (
           <div>
@@ -908,7 +1162,7 @@ export default function AdminDashboard() {
           </div>
         );
       default:
-        return null;
+        return <div>Select a section from the sidebar.</div>;
     }
   };
 
@@ -975,6 +1229,19 @@ export default function AdminDashboard() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
                 Tasks
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => setActiveSection('documents')}
+                className={`flex items-center w-full p-3 rounded-md ${
+                  activeSection === 'documents' ? 'bg-purple-100 text-purple-700' : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                <svg className="w-6 h-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+                Documents
               </button>
             </li>
             <li>

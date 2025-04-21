@@ -1,0 +1,5 @@
+2025-04-21 12:12:22,774 - INFO - Loading embedding model
+2025-04-21 12:12:22,776 - INFO - Use pytorch device_name: cpu
+2025-04-21 12:12:22,776 - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-04-21 12:12:25,094 - INFO - Loading existing RAG index
+2025-04-21 12:12:25,096 - INFO - Loaded 32 chunks and 63 embeddings

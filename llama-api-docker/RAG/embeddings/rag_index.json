@@ -1,0 +1,280 @@
+{
+  "metadata": [
+    {
+      "filename": "ai_systems.txt",
+      "path": "C:\\Users\\TechTroniX\\Documents\\AutoConfig-1\\llama-api-docker\\RAG\\documents\\ai_systems.txt",
+      "doc_index": 0,
+      "num_chunks": 20
+    },
+    {
+      "filename": "employee_info.txt",
+      "path": "C:\\Users\\TechTroniX\\Documents\\AutoConfig-1\\llama-api-docker\\RAG\\documents\\employee_info.txt",
+      "doc_index": 1,
+      "num_chunks": 17
+    },
+    {
+      "filename": "sample_document.txt",
+      "path": "C:\\Users\\TechTroniX\\Documents\\AutoConfig-1\\llama-api-docker\\RAG\\documents\\sample_document.txt",
+      "doc_index": 2,
+      "num_chunks": 26
+    }
+  ],
+  "document_index": {
+    "0": {
+      "doc_idx": 0,
+      "chunk_idx": 0
+    },
+    "1": {
+      "doc_idx": 0,
+      "chunk_idx": 1
+    },
+    "2": {
+      "doc_idx": 0,
+      "chunk_idx": 2
+    },
+    "3": {
+      "doc_idx": 0,
+      "chunk_idx": 3
+    },
+    "4": {
+      "doc_idx": 0,
+      "chunk_idx": 4
+    },
+    "5": {
+      "doc_idx": 0,
+      "chunk_idx": 5
+    },
+    "6": {
+      "doc_idx": 0,
+      "chunk_idx": 6
+    },
+    "7": {
+      "doc_idx": 0,
+      "chunk_idx": 7
+    },
+    "8": {
+      "doc_idx": 0,
+      "chunk_idx": 8
+    },
+    "9": {
+      "doc_idx": 0,
+      "chunk_idx": 9
+    },
+    "10": {
+      "doc_idx": 0,
+      "chunk_idx": 10
+    },
+    "11": {
+      "doc_idx": 0,
+      "chunk_idx": 11
+    },
+    "12": {
+      "doc_idx": 0,
+      "chunk_idx": 12
+    },
+    "13": {
+      "doc_idx": 0,
+      "chunk_idx": 13
+    },
+    "14": {
+      "doc_idx": 0,
+      "chunk_idx": 14
+    },
+    "15": {
+      "doc_idx": 0,
+      "chunk_idx": 15
+    },
+    "16": {
+      "doc_idx": 0,
+      "chunk_idx": 16
+    },
+    "17": {
+      "doc_idx": 0,
+      "chunk_idx": 17
+    },
+    "18": {
+      "doc_idx": 0,
+      "chunk_idx": 18
+    },
+    "19": {
+      "doc_idx": 0,
+      "chunk_idx": 19
+    },
+    "20": {
+      "doc_idx": 1,
+      "chunk_idx": 0
+    },
+    "21": {
+      "doc_idx": 1,
+      "chunk_idx": 1
+    },
+    "22": {
+      "doc_idx": 1,
+      "chunk_idx": 2
+    },
+    "23": {
+      "doc_idx": 1,
+      "chunk_idx": 3
+    },
+    "24": {
+      "doc_idx": 1,
+      "chunk_idx": 4
+    },
+    "25": {
+      "doc_idx": 1,
+      "chunk_idx": 5
+    },
+    "26": {
+      "doc_idx": 1,
+      "chunk_idx": 6
+    },
+    "27": {
+      "doc_idx": 1,
+      "chunk_idx": 7
+    },
+    "28": {
+      "doc_idx": 1,
+      "chunk_idx": 8
+    },
+    "29": {
+      "doc_idx": 1,
+      "chunk_idx": 9
+    },
+    "30": {
+      "doc_idx": 1,
+      "chunk_idx": 10
+    },
+    "31": {
+      "doc_idx": 1,
+      "chunk_idx": 11
+    },
+    "32": {
+      "doc_idx": 1,
+      "chunk_idx": 12
+    },
+    "33": {
+      "doc_idx": 1,
+      "chunk_idx": 13
+    },
+    "34": {
+      "doc_idx": 1,
+      "chunk_idx": 14
+    },
+    "35": {
+      "doc_idx": 1,
+      "chunk_idx": 15
+    },
+    "36": {
+      "doc_idx": 1,
+      "chunk_idx": 16
+    },
+    "37": {
+      "doc_idx": 2,
+      "chunk_idx": 0
+    },
+    "38": {
+      "doc_idx": 2,
+      "chunk_idx": 1
+    },
+    "39": {
+      "doc_idx": 2,
+      "chunk_idx": 2
+    },
+    "40": {
+      "doc_idx": 2,
+      "chunk_idx": 3
+    },
+    "41": {
+      "doc_idx": 2,
+      "chunk_idx": 4
+    },
+    "42": {
+      "doc_idx": 2,
+      "chunk_idx": 5
+    },
+    "43": {
+      "doc_idx": 2,
+      "chunk_idx": 6
+    },
+    "44": {
+      "doc_idx": 2,
+      "chunk_idx": 7
+    },
+    "45": {
+      "doc_idx": 2,
+      "chunk_idx": 8
+    },
+    "46": {
+      "doc_idx": 2,
+      "chunk_idx": 9
+    },
+    "47": {
+      "doc_idx": 2,
+      "chunk_idx": 10
+    },
+    "48": {
+      "doc_idx": 2,
+      "chunk_idx": 11
+    },
+    "49": {
+      "doc_idx": 2,
+      "chunk_idx": 12
+    },
+    "50": {
+      "doc_idx": 2,
+      "chunk_idx": 13
+    },
+    "51": {
+      "doc_idx": 2,
+      "chunk_idx": 14
+    },
+    "52": {
+      "doc_idx": 2,
+      "chunk_idx": 15
+    },
+    "53": {
+      "doc_idx": 2,
+      "chunk_idx": 16
+    },
+    "54": {
+      "doc_idx": 2,
+      "chunk_idx": 17
+    },
+    "55": {
+      "doc_idx": 2,
+      "chunk_idx": 18
+    },
+    "56": {
+      "doc_idx": 2,
+      "chunk_idx": 19
+    },
+    "57": {
+      "doc_idx": 2,
+      "chunk_idx": 20
+    },
+    "58": {
+      "doc_idx": 2,
+      "chunk_idx": 21
+    },
+    "59": {
+      "doc_idx": 2,
+      "chunk_idx": 22
+    },
+    "60": {
+      "doc_idx": 2,
+      "chunk_idx": 23
+    },
+    "61": {
+      "doc_idx": 2,
+      "chunk_idx": 24
+    },
+    "62": {
+      "doc_idx": 2,
+      "chunk_idx": 25
+    }
+  },
+  "embedding_model": "all-MiniLM-L6-v2",
+  "chunk_size": 256,
+  "chunk_overlap": 32,
+  "num_chunks": 63
+}

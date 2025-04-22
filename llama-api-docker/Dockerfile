@@ -1,5 +1,5 @@
-# Use a more recent PyTorch image
-FROM pytorch/pytorch:2.1.0-cuda12.1-cudnn8-runtime
+# Use Python 3.10 slim image as base
+FROM python:3.10-slim
 
 # Set working directory
 WORKDIR /app
@@ -15,33 +15,22 @@ RUN apt-get update && apt-get install -y \
 # Copy requirements first to leverage Docker cache
 COPY requirements.txt .
 
-# Install additional Python dependencies
+# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
-
-# Install RAG requirements
-COPY RAG/requirements.txt ./rag_requirements.txt
-RUN pip install --no-cache-dir -r rag_requirements.txt
 
 # Copy the application code
 COPY api_server.py .
-COPY downloading_model.py .
-COPY run_locally.py .
 COPY start_api.sh .
 RUN chmod +x start_api.sh
 
-# Create model directory
+# Create directory for models (will be mounted as volume)
 RUN mkdir -p /app/models
 
-# Copy the RAG system
-COPY RAG/ /app/RAG/
-
 # Environment variable for model path
-ENV MODEL_DIR=/app/models/Llama-3.2-1B
-ENV PYTHONPATH=/app
+ENV MODEL_DIR=/app/models/Llama-3.2-1B_new
 
-# Expose the ports
+# Expose the port the app runs on
 EXPOSE 8000
-EXPOSE 8001
 
 # Command to run the application
 CMD ["./start_api.sh"]

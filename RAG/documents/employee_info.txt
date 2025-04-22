@@ -1,0 +1,68 @@
+# AutoConfig Employee Guide
+
+## Company Overview
+AutoConfig is a leading AI solutions provider specializing in deploying and managing AI systems for enterprise clients. Our mission is to empower businesses with cutting-edge AI technologies while maintaining the highest standards of security, ethics, and performance.
+
+## Employee Benefits
+- Comprehensive healthcare package including dental and vision
+- 401(k) matching up to 5% of salary
+- 20 days paid time off annually, plus 10 federal holidays
+- Flexible work arrangements including remote work options
+- Professional development allowance of $2,000 per year
+- Gym membership reimbursement
+- Mental health services through our EAP program
+
+## Company Policies
+### Work Hours
+Standard work hours are 9:00 AM to 5:00 PM local time, Monday through Friday. Flexible scheduling is available with manager approval.
+
+### Remote Work
+Employees are allowed to work remotely up to 3 days per week, with specific arrangements to be approved by their direct manager.
+
+### Performance Reviews
+Performance reviews are conducted semi-annually in June and December. These reviews assess goal achievement, skill development, and alignment with company values.
+
+### Data Security
+All employees must adhere to our data security protocols:
+- Use company-provided VPN when accessing internal systems remotely
+- Enable 2FA for all company accounts
+- Never share login credentials
+- Encrypt sensitive customer data
+- Report security incidents immediately to security@autoconfig.com
+
+## AI Systems at AutoConfig
+Our company develops and maintains several AI systems:
+
+### LLM Deployment Framework
+Our flagship product allows enterprises to deploy large language models on their own infrastructure with enhanced security and customization options.
+
+### RAGSystem
+Our Retrieval-Augmented Generation system provides context-aware responses by retrieving information from company knowledge bases before generating responses.
+
+### ComplianceGuard
+An AI system that ensures all AI-generated content complies with regulatory requirements and company policies.
+
+## Training Resources
+Employees have access to our internal learning platform at learning.autoconfig.internal, which includes:
+- AI fundamentals courses
+- Programming tutorials
+- Security best practices
+- Leadership development
+- Customer service training
+
+## IT Support
+For technical issues, employees can contact the IT help desk:
+- Email: helpdesk@autoconfig.com
+- Phone: 555-123-4567
+- Internal chat: #it-support channel
+
+## Expense Reimbursement
+Employees can submit expense reports through the finance portal. Receipts are required for all expenses over $25. Reimbursement is typically processed within 5-7 business days.
+
+## Company Events
+- Annual company retreat in September
+- Quarterly team building activities
+- Monthly Tech Talks (every third Thursday)
+- Holiday party in December
+
+For more information, please refer to the complete Employee Handbook available on our intranet. 

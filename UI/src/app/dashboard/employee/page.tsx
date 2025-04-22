@@ -390,28 +390,66 @@ export default function EmployeeDashboard() {
       });
 
       // Simulate AI response
-      setTimeout(async () => {
-        const aiMessage = {
-          content: 'I\'m analyzing your request and will respond shortly. This is a simulated response in the demo. In a production environment, this would connect to the AutoConfig AI to provide intelligent assistance.',
+      try {
+        const llmResponse = await fetch('/api/llm/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ message: inputValue }),
+        });
+        
+        const llmData = await llmResponse.json();
+        
+        if (llmResponse.ok && llmData.success) {
+          const aiMessage = {
+            content: llmData.response,
+            sender: 'ai' as const,
+            timestamp: new Date().toISOString()
+          };
+          
+          setChatMessages(prev => [...prev, aiMessage]);
+          
+          // Also save AI message to API
+          try {
+            await fetch(`/api/chats/${currentChat}/messages`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(aiMessage),
+            });
+          } catch (err) {
+            console.error('Error saving AI message:', err);
+          }
+        } else {
+          throw new Error(llmData.message || 'Failed to get response from LLM');
+        }
+      } catch (err) {
+        console.error('Error getting LLM response:', err);
+        
+        // Fallback to a generic message if LLM call fails
+        const fallbackMessage = {
+          content: 'I apologize, but I encountered an issue while processing your request. Please try again later.',
           sender: 'ai' as const,
           timestamp: new Date().toISOString()
         };
         
-        setChatMessages(prev => [...prev, aiMessage]);
+        setChatMessages(prev => [...prev, fallbackMessage]);
         
-        // Also save AI message to API
+        // Save fallback message to API
         try {
           await fetch(`/api/chats/${currentChat}/messages`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify(aiMessage),
+            body: JSON.stringify(fallbackMessage),
           });
-        } catch (err) {
-          console.error('Error saving AI message:', err);
+        } catch (saveErr) {
+          console.error('Error saving fallback message:', saveErr);
         }
-      }, 1000);
+      }
     } catch (err) {
       console.error('Error sending message:', err);
       setError('Failed to send message. Please try again.');

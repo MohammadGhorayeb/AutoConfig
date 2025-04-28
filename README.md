@@ -1,191 +1,174 @@
-# AutoConfig
-Get ready
+# AutoConfig - AI-Powered Configuration Assistant
 
-# Create Docker network (ignore error if already exists)
-docker network create llama-network || true
+AutoConfig is a sophisticated AI-powered system that combines multiple components to provide intelligent configuration assistance. The system integrates a Next.js frontend, NeMo Guardrails for content moderation, and a Llama-based language model for natural language processing.
 
-# Stop and remove existing containers (ignore errors if they don't exist)
-docker rm -f llama-api inference-ui || true
+## 🚀 Features
 
-# Build both images
-docker build -t llama-api ./llama-api-docker
-docker build -t inference-ui ./inference-ui
+- **Modern Web Interface**: Built with Next.js 14, providing a responsive and user-friendly experience
+- **Content Moderation**: Powered by NeMo Guardrails to ensure appropriate and safe responses
+- **Language Model Integration**: Utilizes Llama 3.2 1B model for natural language understanding
+- **Dockerized Deployment**: Easy setup and deployment using Docker Compose
+- **Health Monitoring**: Built-in health checks for all services
+- **Scalable Architecture**: Modular design allowing for easy extension and maintenance
 
-# Run both containers
-docker run -d \
-  --name llama-api \
-  --network llama-network \
-  -p 8000:8000 \
-  -v $(pwd)/llama-api-docker/models:/app/models \
-  llama-api
+## 🏗️ Architecture
 
-docker run -d \
-  --name inference-ui \
-  --network llama-network \
-  -p 3000:3000 \
-  inference-ui
+The system consists of several interconnected services:
 
-# Show running containers
-docker ps
+1. **UI Service** (`UI/`)
+   - Next.js 14 frontend application
+   - Handles user interactions and displays responses
+   - Communicates with NeMo Guardrails service
 
-# Show logs of both containers
-echo "=== Llama API Logs ==="
-docker logs llama-api
-echo "=== Inference UI Logs ==="
-docker logs inference-ui
+2. **NeMo Guardrails Service** (`nemo_guardrails/`)
+   - Content moderation and safety layer
+   - Custom LLM integration
+   - Configurable guardrails for response filtering
 
-chmod +x run_all.sh
-./run_all.sh
+3. **Llama API Service** (`llama-api-docker/`)
+   - Hosts the Llama 3.2 1B language model
+   - Provides text generation capabilities
+   - REST API interface for model access
 
-# Llama Inference System
+4. **RAG Service** (`RAG/`)
+   - Retrieval-Augmented Generation capabilities
+   - Document processing and embedding
+   - Enhanced response generation
 
-## Quick Start with Docker Compose
+## 🛠️ Prerequisites
 
-1. **Prerequisites**
-   - Docker and Docker Compose installed
-   - The Llama model files in transformers format (config.json, tokenizer files, model weights)
+- Docker and Docker Compose
+- Node.js 18+ (for local development)
+- Python 3.10+ (for local development)
+- Git
+- Llama model files (see Quick Start section)
 
-2. **Setup**
-   - Place the model files in: `llama-api-docker/models_new/Llama-3.2-1B_new/`
-   - The system uses HuggingFace Transformers to load the model (not llama-cpp)
+## 🚀 Quick Start
 
-3. **Run the System**
+1. Clone the repository:
    ```bash
-   # Build and start all services
+   git clone https://github.com/yourusername/AutoConfig.git
+   cd AutoConfig
+   ```
+
+2. **Prepare Model Files**
+   - Place your Llama model files in the following structure:
+     ```
+     llama-api-docker/
+     └── models_new/
+         └── Llama-3.2-1B_new/
+             ├── model.safetensors
+             ├── tokenizer.json
+             ├── config.json
+             └── tokenizer_config.json
+     ```
+   - The model files should be in the same format as the example files in the repository
+   - Ensure all required model files are present before starting the services
+
+3. Start the services:
+   ```bash
    docker-compose up -d
-
-   # View logs
-   docker-compose logs -f
-
-   # Stop services
-   docker-compose down
    ```
 
-4. **Rebuild (after changes)**
+4. Access the application:
+   - UI: http://localhost:3001
+   - NeMo Guardrails API: http://localhost:8080
+   - Llama API: http://localhost:8000
+
+## 🔧 Configuration
+
+### Environment Variables
+
+- `NEMO_API_URL`: URL for the NeMo Guardrails service (default: http://nemo-guardrails:8080)
+- `LLAMA_API_URL`: URL for the Llama API service (default: http://llama-api:8000)
+- `MONGODB_URI`: MongoDB connection string (default: mongodb://mongodb:27017/autoconfig)
+
+### Service Configuration
+
+Each service can be configured through its respective configuration files:
+
+- NeMo Guardrails: `nemo_guardrails/config/`
+- Llama API: `llama-api-docker/config/`
+- RAG Service: `RAG/config/`
+
+## 🧪 Development
+
+### Local Development Setup
+
+1. Install dependencies:
    ```bash
-   docker-compose up -d --build
+   # UI
+   cd UI
+   npm install
+
+   # NeMo Guardrails
+   cd ../nemo_guardrails
+   pip install -r requirements.txt
+
+   # Llama API
+   cd ../llama-api-docker
+   pip install -r requirements.txt
    ```
 
-5. **Individual Container Management**
+2. Start services individually:
    ```bash
-   # Start/stop specific service
-   docker-compose up -d llama-api
-   docker-compose up -d inference-ui
+   # UI
+   cd UI
+   npm run dev
 
-   # View specific logs
-   docker-compose logs -f llama-api
-   docker-compose logs -f inference-ui
+   # NeMo Guardrails
+   cd ../nemo_guardrails
+   python api.py
+
+   # Llama API
+   cd ../llama-api-docker
+   python api_server.py
    ```
 
-## Accessing the Interface
+## 📚 API Documentation
 
-1. **Web Interface**
-   - URL: `http://localhost:3000`
-   - Features:
-     - Interactive text input
-     - Temperature control (0-1)
-     - Max tokens adjustment
-     - Real-time response display
+### NeMo Guardrails API
 
-2. **API Testing with Postman**
-   - Base URL: `http://localhost:8000`
-   
-   **API Health Check:**
-   - URL: `http://localhost:8000/health`
-   - Method: `GET`
-   - Returns basic health status of the API
+- **Endpoint**: `/chat`
+- **Method**: POST
+- **Request Body**:
+  ```json
+  {
+    "message": "Your message here",
+    "max_tokens": 512,
+    "temperature": 0.7
+  }
+  ```
+- **Response**:
+  ```json
+  {
+    "success": true,
+    "response": "Generated response"
+  }
+  ```
 
-   **Generate Text Endpoint:**
-   - URL: `http://localhost:8000/generate`
-   - Method: `POST`
-   - Headers: 
-     ```
-     Content-Type: application/json
-     ```
-   - Request Body:
-     ```json
-     {
-       "prompt": "Your text prompt here",
-       "temperature": 0.7,
-       "max_tokens": 100,
-       "stop": ["Q:"],
-       "top_p": 0.9
-     }
-     ```
+### Llama API
 
-   **Model Info Endpoint:**
-   - URL: `http://localhost:8000/model-info`
-   - Method: `GET`
-   - No body required
-   - Returns information about the loaded model including status
+- **Endpoint**: `/generate`
+- **Method**: POST
+- **Request Body**:
+  ```json
+  {
+    "prompt": "Your prompt here",
+    "max_tokens": 1024,
+    "temperature": 0.7
+  }
+  ```
 
-   Example curl command:
-   ```bash
-   curl -X POST http://localhost:8000/generate \
-     -H "Content-Type: application/json" \
-     -d '{
-       "prompt": "Tell me a short story",
-       "temperature": 0.7,
-       "max_tokens": 100,
-       "stop": ["Q:"],
-       "top_p": 0.9
-     }'
-   ```
+## 🤝 Contributing
 
-## System Architecture
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-The system consists of two main components:
+## 🙏 Acknowledgments
 
-1. **Llama API (Backend)**
-   - FastAPI server loading the LLaMA model with HuggingFace Transformers
-   - Provides endpoints for text generation and model information
-   - Automatically loads model from the specified directory
-
-2. **Inference UI (Frontend)**
-   - Simple web interface for interacting with the model
-   - Sends requests to the API and displays responses
-   - Provides controls for adjusting generation parameters
-
-## Manual Setup (Alternative to Docker Compose)
-
-```bash
-# Create Docker network
-docker network create llama-network || true
-
-# Stop and remove existing containers
-docker rm -f llama-api inference-ui || true
-
-# Build both images
-docker build -t llama-api ./llama-api-docker
-docker build -t inference-ui ./inference-ui
-
-# Run both containers
-docker run -d \
-  --name llama-api \
-  --network llama-network \
-  -p 8000:8000 \
-  -v $(pwd)/llama-api-docker/models_new:/app/models_new \
-  llama-api
-
-docker run -d \
-  --name inference-ui \
-  --network llama-network \
-  -p 3000:3000 \
-  inference-ui
-
-# Show running containers
-docker ps
-
-# Show logs of both containers
-echo "=== Llama API Logs ==="
-docker logs llama-api
-echo "=== Inference UI Logs ==="
-docker logs inference-ui
-```
-
-## Troubleshooting
-
-- If the model fails to load, check that all required files are in the model directory
-- The API provides a `/health` endpoint that will respond even if the model is still loading
-- Check container logs for detailed error messages
-- Ensure your model is compatible with HuggingFace Transformers
+- [NeMo Guardrails](https://github.com/NVIDIA/NeMo-Guardrails)
+- [Next.js](https://nextjs.org/)

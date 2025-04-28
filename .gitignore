@@ -84,3 +84,6 @@ thumbs.db
 *.sqlite
 *.sqlite3
 *.db
+
+# Git pack files
+.git/objects/pack/

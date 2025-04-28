@@ -1,0 +1,35 @@
+services:
+  ui:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://mongodb:27017/autoconfig
+      - JWT_SECRET=autoconfig-secure-jwt-token-Z72D9QXM5EKP6BR8WY3VJ4CTU
+      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_SECRET=another_random_secret_key_replace_this_in_production
+    volumes:
+      # Mount source code for development
+      - ./:/app
+      # Don't overwrite node_modules in container
+      - /app/node_modules
+    restart: unless-stopped
+    depends_on:
+      - mongodb
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=autoconfig
+    restart: unless-stopped
+
+volumes:
+  mongodb_data:
+    driver: local 

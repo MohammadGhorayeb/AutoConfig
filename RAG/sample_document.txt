@@ -1,0 +1,144 @@
+# AutoConfig Employee Handbook
+
+## Introduction
+
+Welcome to AutoConfig! This document serves as a comprehensive guide to our company policies, procedures, and employee benefits. All employees are expected to familiarize themselves with the content of this handbook.
+
+## Company Overview
+
+AutoConfig specializes in developing and deploying local LLM (Large Language Model) solutions for enterprise environments. Our mission is to provide organizations with powerful AI capabilities while maintaining data privacy, security, and control.
+
+### Our Core Values
+
+1. **Innovation**: We constantly push the boundaries of what's possible with local AI.
+2. **Reliability**: Our solutions are designed to be robust and dependable.
+3. **Security**: We prioritize the protection of our clients' data and systems.
+4. **Accessibility**: We make advanced AI technology accessible to organizations of all sizes.
+
+## Onboarding Process
+
+### New Employee Onboarding
+
+The onboarding process at AutoConfig consists of the following steps:
+
+1. **Pre-arrival preparation**:
+   - HR will send you an onboarding packet via email
+   - Complete all required paperwork and return it before your start date
+   - IT will set up your accounts and prepare necessary equipment
+
+2. **First day**:
+   - Arrive at 9:00 AM and check in with reception
+   - Meet with your manager for an overview of your role and responsibilities
+   - Complete orientation with HR
+   - Set up your workstation and equipment
+
+3. **First week**:
+   - Complete required training modules
+   - Attend department introductions
+   - Join team meetings to understand current projects
+   - Schedule 1:1 meetings with key collaborators
+
+4. **First month**:
+   - Complete all mandatory training
+   - Develop performance goals with your manager
+   - Begin contributing to team projects
+   - Attend the monthly all-hands meeting
+
+### Required Documentation
+
+All new employees must provide:
+- Government-issued ID
+- Social Security card or other work authorization
+- Completed W-4 and I-9 forms
+- Direct deposit information
+- Emergency contact information
+
+## Employee Benefits
+
+### Health Insurance
+
+AutoConfig provides comprehensive health insurance coverage for all full-time employees. Coverage begins on the first day of the month following your start date.
+
+Plans include:
+- PPO Option with nationwide coverage
+- HMO Option with lower premiums
+- HSA-compatible high-deductible plan
+
+### Retirement Benefits
+
+We offer a 401(k) retirement plan with company matching:
+- Company matches 100% of the first 3% of employee contributions
+- Additional 50% match on the next 2% of contributions
+- Immediate vesting for employee contributions
+- 3-year graded vesting for company match
+
+### Paid Time Off (PTO)
+
+AutoConfig provides a competitive PTO package:
+- 15 days of PTO annually for employees with 0-3 years of service
+- 20 days of PTO annually for employees with 4-7 years of service 
+- 25 days of PTO annually for employees with 8+ years of service
+- 10 paid company holidays each year
+- 5 days of sick leave annually
+
+## Technology Policies
+
+### Equipment Usage
+
+All employees are provided with the necessary equipment to perform their job duties:
+- Laptop computer
+- Monitor, keyboard, and mouse
+- Company phone (for eligible positions)
+
+Equipment remains the property of AutoConfig and must be returned upon termination of employment.
+
+### Security Protocols
+
+To maintain the security of our systems and data:
+- All devices must be password-protected
+- Two-factor authentication is required for all company accounts
+- Employees must lock their computers when away from their desks
+- Regular security training is mandatory for all employees
+- Report any security concerns immediately to the IT department
+
+## LLM Usage Guidelines
+
+### Appropriate Use Cases
+
+AutoConfig's LLM technology should be used for:
+- Assisting with documentation and content creation
+- Answering questions based on company knowledge base
+- Automating routine communications
+- Research and data analysis support
+
+### Data Privacy Considerations
+
+When using our LLM systems:
+- Never input confidential client information without proper authorization
+- Use the appropriate security classification for all projects
+- Follow data retention policies for all LLM interactions
+- Understand that system administrators may review usage logs
+
+## Performance Management
+
+### Review Process
+
+Employee performance is evaluated through:
+- Quarterly check-ins with direct managers
+- Annual comprehensive performance reviews
+- Peer feedback collection
+- Self-assessment
+
+### Career Development
+
+AutoConfig is committed to employee growth:
+- Individual Development Plans (IDPs) are created annually
+- Professional development budget of $1,500 per employee
+- Internal mobility opportunities are posted before external recruiting
+- Mentorship program available to all employees
+
+## Conclusion
+
+This handbook provides an overview of AutoConfig's policies and benefits. For detailed information, please refer to the specific policy documents available on the company intranet.
+
+Last updated: January 15, 2023 

@@ -1,62 +1,114 @@
-version: '3.8'
+version: "3.9"
 
 services:
-  # LLama API Service
   llama-api:
-    image: llama-api  # Replace with your actual image name if different
+    build: ./llama-api-docker        # or image: ghcr.io/you/llama-api:1.0.0
     container_name: llama-api
+    environment:
+      MODEL_DIR: /app/models/Llama-3.2-1B_new
+      PYTHONPATH: /app
+    volumes:
+      - ./llama-api-docker/models_new:/app/models:ro
     ports:
       - "8000:8000"
-    volumes:
-      - ./models:/app/models  # Mount models directory if needed
     networks:
-      - llm-net
+      - app-network
+    restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
-      timeout: 10s
+      timeout: 5s
       retries: 3
       start_period: 40s
+  
+  # RAG Service
+  # rag-service:
+  #   image: python:3.10-slim
+  #   container_name: rag-service
+  #   command: sh -c "pip install -r /app/RAG/requirements.txt && python /app/RAG/light_rag.py"
+  #   volumes:
+  #     - ./llama-api-docker/models_new:/app/models
+  #     - ./RAG:/app/RAG
+  #   ports:
+  #     - "8001:8001"
+  #   environment:
+  #     - MODEL_DIR=/app/models/Llama-3.2-1B_new
+  #     - RAG_PORT=8001
+  #     - PYTHONPATH=/app
+  #   networks:
+  #     - app-network
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+  #     start_period: 60s
+    
+  # UI Application
+  # ui:
+  #   build:
+  #     context: ./UI
+  #     dockerfile: Dockerfile
+  #   container_name: ui-app
+  #   ports:
+  #     - "3001:3000"
+  #   environment:
+  #     - NODE_ENV=development
+  #     - MONGODB_URI=mongodb://mongodb:27017/autoconfig
+  #     - LLAMA_API_URL=http://llama-api:8000
+  #     - NEMO_API_URL=http://nemo-guardrails:8080
+  #     - RAG_API_URL=http://rag-service:8001
+  #   volumes:
+  #     - ./UI:/app
+  #     - /app/node_modules
+  #   depends_on:
+  #     - mongodb
+  #     - llama-api
+  #     - rag-service
+  #     - nemo-guardrails
+  #   networks:
+  #     - app-network
+      
+  # MongoDB Database
+  # mongodb:
+  #   image: mongo:latest
+  #   container_name: mongodb
+  #   ports:
+  #     - "27018:27017"
+  #   volumes:
+  #     - mongodb_data:/data/db
+  #   environment:
+  #     - MONGO_INITDB_DATABASE=autoconfig
+  #   networks:
+  #     - app-network
 
   # NeMo Guardrails Service
   nemo-guardrails:
-    build:
-      context: ./nemo_guardrails
-    image: nemo-guardrails
+    build: ./nemo_guardrails
     container_name: nemo-guardrails
     environment:
       - LLAMA_API_URL=http://llama-api:8000/generate
+      - TIMEOUT=300
+      - NEMOGUARDRAILS_DISABLE_EMBEDDING=true
     ports:
       - "8080:8080"
     networks:
-      - llm-net
+      - app-network
     depends_on:
       - llama-api
+    restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 30s
-      timeout: 10s
+      timeout: 5s
       retries: 3
-      start_period: 60s
-
-  # Inference UI Service
-  inference-ui:
-    build:
-      context: ./inference-ui
-    image: inference-ui
-    container_name: inference-ui
-    environment:
-      - PORT=3000
-      - LLAMA_API_URL=http://nemo-guardrails:8080  # Don't include /generate or /chat
-    ports:
-      - "3000:3000"
-    networks:
-      - llm-net
-    depends_on:
-      - nemo-guardrails
+      start_period: 30s
 
 networks:
-  llm-net:
-    name: llm-net
-    external: true
+  app-network:
+    driver: bridge
+    
+# volumes:
+#   mongodb_data:
+#     driver: local
       
